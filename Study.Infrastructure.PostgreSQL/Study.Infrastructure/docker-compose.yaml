@@ -1,0 +1,44 @@
+﻿version: "3.8"
+services:
+  study_db:
+    container_name: study-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/study-postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - private
+      - public
+    restart: unless-stopped
+
+  study_dms:
+    container_name: study-pg-admin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin:/var/lib/study-pg-admin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - private
+      - public
+    restart: unless-stopped
+
+networks:
+  public:
+    driver: bridge
+  private:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:
+    driver: local
